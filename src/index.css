@@ -1,16 +1,17 @@
 /* src/index.css */
-html, body, #root, canvas {
+html, body, #root {
   margin: 0;
   padding: 0;
-  height: 100%;
-  width: 100%;
   display: block;
 }
+
 .stage-container {
   background-color: #f8f8f8;
   border: 2px solid #ccc;
   margin: 20px auto;
   display: block;
+  width: 2100px;
+  height: 600px;
 }
 button {
   margin: 10px;
