@@ -25,10 +25,12 @@ const createDragBoundCircle = (shapeWidth, shapeHeight) => {
 
 
 const Draw = () => {
+  //状態管理
   const [rects, setRects] = useState([]);
   const [circle, setCircle] = useState([]);
+  //Konva.Stage の参照
   const stageRef = useRef(null);
-
+    //四角追加
     const handleAddRect = () => {
     const id = rects.length;
     const newRect = {
@@ -45,7 +47,7 @@ const Draw = () => {
     };
     setRects([...rects, newRect]);
   };
-
+  //円追加
   const handleAddCircle = () => {
     const id = circle.length;
     const newCircle = {
@@ -62,67 +64,82 @@ const Draw = () => {
     setCircle([...circle, newCircle]);
   };
 
-
-  const handleEditText = (shape, id, isRect) => {
-    const container = stageRef.current.container();
-    const shapeNode = document.querySelector(`#text-${isRect ? 'rect' : 'circle'}-${id}`);
-    const textNode = shapeNode.getBoundingClientRect();
-    const stageBox = container.getBoundingClientRect();
-
+  //テキスト編集
+  const handleEditText = (id, isRect) => {
+    // Konva Text ノードを取得
+    const selector = isRect ? `.text-rect-${id}` : `.text-circle-${id}`;
+    const textNode = stageRef.current.findOne(selector);
+    if (!textNode) return;
+    // ステージ上の絶対座標
+    const absPos = textNode.getAbsolutePosition();
+    // ステージ container の位置
+    const stageBox = stageRef.current.container().getBoundingClientRect();
+    // ページ上のテキスト位置
     const areaPosition = {
-      x: stageBox.left + textNode.left - stageBox.left,
-      y: stageBox.top + textNode.top - stageBox.top,
+      x: stageBox.left + absPos.x,
+      y: stageBox.top + absPos.y,
     };
+    // テキストサイズ
+    const width = textNode.width();
+    const height = textNode.height();
 
+    // textarea を作成
     const textarea = document.createElement('textarea');
     document.body.appendChild(textarea);
-
-    textarea.value = shape.text;
-    textarea.style.position = 'absolute';
-    textarea.style.top = `${areaPosition.y}px`;
-    textarea.style.left = `${areaPosition.x}px`;
-    textarea.style.width = `${textNode.width}px`;
-    textarea.style.height = `${textNode.height}px`;
-    textarea.style.fontSize = '18px';
-    textarea.style.border = 'none';
-    textarea.style.padding = '0px';
-    textarea.style.margin = '0px';
-    textarea.style.overflow = 'hidden';
-    textarea.style.background = 'none';
-    textarea.style.outline = 'none';
-    textarea.style.resize = 'none';
-    textarea.style.lineHeight = '1';
-    textarea.style.fontFamily = 'Calibri';
-    textarea.style.textAlign = 'center';
-    textarea.style.color = 'black';
-    textarea.style.zIndex = 1000;
-
+    textarea.value = textNode.text();
+    // スタイル
+    Object.assign(textarea.style, {
+      position: 'absolute',
+      top: `${areaPosition.y}px`,
+      left: `${areaPosition.x}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+      fontSize: `${textNode.fontSize()}px`,
+      border: 'none', padding: '0', margin: '0',
+      overflow: 'hidden', background: 'none', outline: 'none',
+      resize: 'none', lineHeight: textNode.lineHeight(),
+      fontFamily: textNode.fontFamily(), textAlign: textNode.align(),
+      color: textNode.fill(), zIndex: 1000,
+    });
     textarea.focus();
 
-    const removeTextarea = () => {
-      document.body.removeChild(textarea);
+    const remove = () => {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
     };
-
-    textarea.addEventListener('keydown', (e) => {
+    // Enter で確定
+    textarea.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
+        const value = textarea.value;
         if (isRect) {
-          setRects(rects.map(r => r.id === id ? { ...r, text: textarea.value } : r));
+          setRects(rects.map(r => r.id === id ? { ...r, text: value } : r));
         } else {
-          setCircle(circle.map(c => c.id === id ? { ...c, text: textarea.value } : c));
+          setCircle(circle.map(c => c.id === id ? { ...c, text: value } : c));
         }
-        removeTextarea();
+        remove();
+        // リスナ解除
+        textarea.removeEventListener('keydown', handleKeyDown);
+        textarea.removeEventListener('blur', handleBlur);
       }
     });
-
-    textarea.addEventListener('blur', () => {
+    // blurイベント
+    const handleBlur = () => {
+      const value = textarea.value;
       if (isRect) {
-        setRects(rects.map(r => r.id === id ? { ...r, text: textarea.value } : r));
+        setRects(rects.map(r => r.id === id ? { ...r, text: value } : r));
       } else {
-        setCircle(circle.map(c => c.id === id ? { ...c, text: textarea.value } : c));
+        setCircles(circles.map(c => c.id === id ? { ...c, text: value } : c));
       }
       removeTextarea();
-    });
+      textarea.removeEventListener('keydown', handleKeyDown);
+      textarea.removeEventListener('blur', handleBlur);
+    };
+
+    textarea.addEventListener('keydown', handleKeyDown);
+    textarea.addEventListener('blur', handleBlur);
   };
+
 
 
   return (
@@ -146,7 +163,7 @@ const Draw = () => {
               y={r.y}
               draggable
               dragBoundFunc={createDragBoundRect(r.width, r.height)}
-              onDblClick={() => handleEditText(r, r.id, true)}
+              onDblClick={() => handleEditText(r.id, true)}
             >
               <Rect
                 width={r.width}
@@ -156,6 +173,7 @@ const Draw = () => {
                 strokeWidth={r.strokeWidth}
               />
               <Text
+                name={`text-rect-${r.id}`}
                 text={r.text}
                 fontSize={18}
                 fill="black"
@@ -167,33 +185,34 @@ const Draw = () => {
             </Group>
           ))}
           
-          {circle.map(r => (
+          {circle.map(c => (
             <Group
-              key={r.id}
-              x={r.x}
-              y={r.y}
+              key={c.id}
+              x={c.x}
+              y={c.y}
               draggable
-              dragBoundFunc={createDragBoundCircle(r.radius, r.radius)}
-              onDblClick={() => handleEditText(r, r.id, false)}
+              dragBoundFunc={createDragBoundCircle(c.radius, c.radius)}
+              onDblClick={() => handleEditText(c.id, false)}
             >
               <Circle
-                radius={r.radius}
-                fill={r.fill}
-                stroke={r.stroke}
-                strokeWidth={r.strokeWidth}
+                radius={c.radius}
+                fill={c.fill}
+                stroke={c.stroke}
+                strokeWidth={c.strokeWidth}
                 x={0}
                 y={0}
               />
               <Text
-                text={r.text}
+                name={`text-circle-${c.id}`}
+                text={c.text}
                 fontSize={18}
                 fill="black"
-                width={r.radius*2}
-                height={r.radius*2}
+                width={c.radius*2}
+                height={c.radius*2}
                 align="center"
                 verticalAlign="middle"
-                x={-r.radius}
-                y={-r.radius}
+                x={-c.radius}
+                y={-c.radius}
                 offsetY={-2}
               />
             </Group>
