@@ -120,7 +120,6 @@ const Draw = () => {
           setCircles(circles.map(c => c.id === id ? { ...c, text: value } : c));
         }
         remove();
-        // リスナ解除
         textarea.removeEventListener('keydown', handleKeyDown);
         textarea.removeEventListener('blur', handleBlur);
       }
