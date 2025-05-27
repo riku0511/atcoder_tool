@@ -1,7 +1,7 @@
 // src/Draw.jsx
 import React, { useState,useRef, useEffect } from 'react';
 import { Stage,Layer,Group,Rect,Circle,Text } from 'react-konva';
-//import './index.css';
+import './index.css';
 
 const STAGE_WIDTH = 2100;
 const STAGE_HEIGHT = 600;
