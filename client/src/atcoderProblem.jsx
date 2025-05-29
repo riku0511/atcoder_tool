@@ -1,4 +1,4 @@
-// App.jsx
+// atcoderProblem.jsx
 import React, { useState } from 'react';
 //import axios from 'axios';
 import { Stage, Layer, Text } from 'react-konva';
