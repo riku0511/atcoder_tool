@@ -14,7 +14,6 @@ const AtCoderProblemDraw = () => {
   }
   return (
     <div>
-      <h1>AtCoder 問題抽出ツール</h1>
       <input
         type="text"
         value={url}
