@@ -158,7 +158,7 @@ const Draw = () => {
     <div>
       <button onClick={handleAddRect}>■を追加</button>
       <button onClick={handleAddCircle}>●を追加</button>
-      <button>マージ</button>
+      
       
       {/* 右クリックメニュー */}
       {contextMenu.visible && (

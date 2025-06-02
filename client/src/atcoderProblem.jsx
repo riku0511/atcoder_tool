@@ -27,12 +27,19 @@ const AtCoderProblemDraw = () => {
           <h2>{data.title}</h2>
           <div dangerouslySetInnerHTML={{ __html: data.statement }} />
           <h3>サンプル</h3>
-          {data.samples.map((s, i) => (
-            <div key={i}>
-              <pre><b>入力:</b> {s.input}</pre>
-              <pre><b>出力:</b> {s.output}</pre>
-            </div>
-          ))}
+          <div>
+            {data.samples.map((s, i) => (
+              <div
+                key={i}
+                className="sample-inout"
+                style={{ maxWidth: '200px' }} // 最大幅指定
+              >
+                <pre><b>入力:</b></pre>
+                <pre>{s.input}</pre>
+                <pre><b>出力:</b></pre>
+                <pre>{s.output}</pre>
+              </div>))}
+          </div>
         </div>
       )}
     </div>
