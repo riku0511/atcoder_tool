@@ -32,11 +32,11 @@ const AtCoderProblemDraw = () => {
               <div
                 key={i}
                 className="sample-inout"
-                style={{ maxWidth: '200px' }} // 最大幅指定
+                style={{ maxWidth: '200px' }}
               >
-                <pre><b>入力:</b></pre>
+                <pre><b>入力{i+1}:</b></pre>
                 <pre>{s.input}</pre>
-                <pre><b>出力:</b></pre>
+                <pre><b>出力{i+1}:</b></pre>
                 <pre>{s.output}</pre>
               </div>))}
           </div>
