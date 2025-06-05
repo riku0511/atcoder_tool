@@ -14,4 +14,17 @@ const pool = mysql.createPool({
 
 const promisePool = pool.promise();
 
-export default promisePool;
+// テスト用：データを取得して表示
+async function testQuery() {
+  try {
+    const [rows] = await promisePool.query('SELECT * FROM memos'); // ← 例として 'memos' テーブル
+    console.log('取得したデータ:', rows);
+  } catch (err) {
+    console.error('クエリエラー:', err);
+  } finally {
+    pool.end(); 
+  }
+}
+
+testQuery();
+//export default promisePool;
