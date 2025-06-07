@@ -17,7 +17,7 @@ const promisePool = pool.promise();
 // テスト用：データを取得して表示
 async function testQuery() {
   try {
-    const [rows] = await promisePool.query('SELECT * FROM memos'); // ← 例として 'memos' テーブル
+    const [rows] = await promisePool.query('SELECT * FROM memos'); // memos テーブル
     console.log('取得したデータ:', rows);
   } catch (err) {
     console.error('クエリエラー:', err);
